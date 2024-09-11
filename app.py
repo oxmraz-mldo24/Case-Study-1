@@ -24,96 +24,45 @@ def style_response(style, response):
         response = response.replace("you", "ya").replace("are", "r").replace("hello", "hey").replace("friend", "buddy")
     return response
 
-def get_css(style):
-    """Return corresponding CSS based on the selected style."""
-    if style == "Nautical Marauder":
-        return """
-        body {
-            background-color: #2b2b2b;
-            font-family: 'Trebuchet MS', sans-serif;
-            color: #f4e9c9;
-            background-image: url('https://www.transparenttextures.com/patterns/old-map.png');
-        }
-        .gradio-container {
-            background: rgba(0, 0, 0, 0.7);
-            border: 2px solid #d4af37;
-            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
-        }
-        .gr-chat {
-            font-size: 16px;
-            color: #f4e9c9;
-        }
-        """
-    elif style == "Elizabethan Prose":
-        return """
-        body {
-            background-color: #f5f0e1;
-            font-family: 'Dancing Script', cursive;
-            color: #5c4033;
-            background-image: url('https://www.transparenttextures.com/patterns/old-paper.png');
-        }
-        .gradio-container {
-            background: rgba(255, 255, 255, 0.9);
-            border: 2px solid #a0522d;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .gr-chat {
-            font-size: 18px;
-            color: #5c4033;
-        }
-        """
-    elif style == "Cyber Elite":
-        return """
-        body {
-            background-color: #000000;
-            font-family: 'Courier New', Courier, monospace;
-            color: #00ff00;
-        }
-        .gradio-container {
-            background: #1a1a1a;
-            border: 2px solid #00ff00;
-            box-shadow: 0 4px 8px rgba(0, 255, 0, 0.3);
-        }
-        .gr-chat {
-            font-size: 16px;
-            color: #00ff00;
-        }
-        """
-    elif style == "Slangify":
-        return """
-        body {
-            background-color: #fafafa;
-            font-family: 'Arial', sans-serif;
-            color: #333;
-        }
-        .gradio-container {
-            background: #fff;
-            border: 2px solid #ccc;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .gr-chat {
-            font-size: 16px;
-            color: #333;
-        }
-        """
-    else:
-        # Default style
-        return """
-        body {
-            background-color: #f0f0f0;
-            font-family: 'Arial', sans-serif;
-            color: #333;
-        }
-        .gradio-container {
-            background: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
-        .gr-chat {
-            font-size: 16px;
-            color: #333;
-        }
-        """
+def get_magic_css():
+    """Return magic-themed CSS."""
+    return """
+    body {
+        background-color: #2e003e;
+        font-family: 'Garamond', serif;
+        color: #f0e6f6;
+        background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+        background-size: cover;
+        background-blur: 10px;
+        color: #f0e6f6;
+    }
+    .gradio-container {
+        background: rgba(50, 50, 50, 0.8);
+        border: 2px solid #9b59b6;
+        border-radius: 15px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+    }
+    .gr-chat {
+        font-size: 18px;
+        color: #dcdbe1;
+    }
+    .gr-button {
+        background-color: #9b59b6;
+        border: none;
+        color: #fff;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+    .gr-button:hover {
+        background-color: #8e44ad;
+    }
+    """
 
 def respond(message, history: list[tuple[str, str]], style="Standard Conversational"):
     global stop_inference
@@ -147,8 +96,15 @@ def cancel_inference():
     global stop_inference
     stop_inference = True
 
+def clear_input():
+    """Function to clear the user input after submission."""
+    return ""
+
 # Define the interface
 with gr.Blocks() as demo:
+    gr.Markdown("<h1 style='text-align: center;'>🔮 StyleChat 🔮</h1>")
+    gr.Markdown("Please select the style you would like to talk to the AI in.")
+    
     # Add style selection at the top
     with gr.Row():
         style_selection = gr.Dropdown(
@@ -157,27 +113,22 @@ with gr.Blocks() as demo:
             value="Standard Conversational"
         )
 
-    gr.Markdown("<h1 style='text-align: center;'>🌟 Fancy AI Chatbot 🌟</h1>")
-    gr.Markdown("Interact with the AI chatbot using customizable settings below.")
-
     chat_history = gr.Chatbot(label="Chat")
 
     user_input = gr.Textbox(show_label=False, placeholder="Type your message here...")
 
     cancel_button = gr.Button("Cancel Inference", variant="danger")
 
-    # Apply CSS based on style selection
-    def apply_css(style):
-        return get_css(style)
+    # Apply fixed magic-themed CSS
+    demo.css = get_magic_css()
 
-    # Update CSS dynamically when the style is changed
-    def update_css(style):
-        css = get_css(style)
-        demo.css = css
+    # Submit handler to clear input after submission
+    def handle_submit(message, history, style):
+        response_generator = respond(message, history, style)
+        clear_input()
+        return response_generator
 
-    # Adjusted to ensure history is maintained and passed correctly
-    user_input.submit(respond, [user_input, chat_history, style_selection], chat_history)
-    style_selection.change(update_css)  # Update CSS dynamically
+    user_input.submit(handle_submit, [user_input, chat_history, style_selection], chat_history)
     cancel_button.click(cancel_inference)
 
 if __name__ == "__main__":
