@@ -142,19 +142,13 @@ def respond(message, history: list[tuple[str, str]], style="Standard Conversatio
         response += token
         yield history + [(message, style_response(style, response))]  # Apply selected style to the response
 
+
 def cancel_inference():
     global stop_inference
     stop_inference = True
 
-def clear_input():
-    """Function to clear the user input after submission."""
-    return ""
-
 # Define the interface
 with gr.Blocks() as demo:
-    gr.Markdown("<h1 style='text-align: center;'>🔮 Slangify Chatbot 🔮</h1>")
-    gr.Markdown("Please select the style you would like to talk to the AI in：")
-
     # Add style selection at the top
     with gr.Row():
         style_selection = gr.Dropdown(
@@ -162,25 +156,27 @@ with gr.Blocks() as demo:
             choices=["Standard Conversational", "Nautical Marauder", "Elizabethan Prose", "Cyber Elite", "Slangify"], 
             value="Standard Conversational"
         )
-    
-    user_input = gr.Textbox(show_label=False, placeholder="Type your message here...")
+
+    gr.Markdown("<h1 style='text-align: center;'>🌟 Fancy AI Chatbot 🌟</h1>")
+    gr.Markdown("Interact with the AI chatbot using customizable settings below.")
+
     chat_history = gr.Chatbot(label="Chat")
+
+    user_input = gr.Textbox(show_label=False, placeholder="Type your message here...")
 
     cancel_button = gr.Button("Cancel Inference", variant="danger")
 
     # Apply CSS based on style selection
+    def apply_css(style):
+        return get_css(style)
+
+    # Update CSS dynamically when the style is changed
     def update_css(style):
-        """Update CSS dynamically when the style is changed."""
         css = get_css(style)
         demo.css = css
 
-    # Submit handler to clear input after submission
-    def handle_submit(message, history, style):
-        response_generator = respond(message, history, style)
-        clear_input()
-        return response_generator
-
-    user_input.submit(handle_submit, [user_input, chat_history, style_selection], chat_history)
+    # Adjusted to ensure history is maintained and passed correctly
+    user_input.submit(respond, [user_input, chat_history, style_selection], chat_history)
     style_selection.change(update_css)  # Update CSS dynamically
     cancel_button.click(cancel_inference)
 
