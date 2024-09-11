@@ -10,15 +10,93 @@ pipe = pipeline("text-generation", "microsoft/Phi-3-mini-4k-instruct", torch_dty
 # Global flag to handle cancellation
 stop_inference = False
 
-def respond(
-    message,
-    history: list[tuple[str, str]],
-    system_message="You are a friendly Chatbot.",
-    max_tokens=512,
-    temperature=0.7,
-    top_p=0.95,
-    use_local_model=False,
-):
+def style_response(style, response):
+    """Modify response style based on the selected style."""
+    if style == "Nautical Marauder":
+        response = response.replace("you", "ye").replace("hello", "ahoy").replace("friend", "matey")
+        response = response.replace("is", "be").replace("my", "me").replace("the", "th'").replace("am", "be")
+    elif style == "Elizabethan Prose":
+        response = response.replace("you", "thou").replace("are", "art").replace("is", "be").replace("my", "mine")
+        response = response.replace("your", "thy").replace("the", "thee").replace("has", "hath").replace("do", "doth")
+    elif style == "Cyber Elite":
+        response = response.replace("e", "3").replace("a", "4").replace("t", "7").replace("o", "0").replace("i", "1")
+    return response
+
+def get_css(style):
+    """Return corresponding CSS based on the selected style."""
+    if style == "Nautical Marauder":
+        return """
+        body {
+            background-color: #2b2b2b;
+            font-family: 'Trebuchet MS', sans-serif;
+            color: #f4e9c9;
+            background-image: url('https://www.transparenttextures.com/patterns/old-map.png');
+        }
+        .gradio-container {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #d4af37;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+        }
+        .gr-chat {
+            font-size: 16px;
+            color: #f4e9c9;
+        }
+        """
+    elif style == "Elizabethan Prose":
+        return """
+        body {
+            background-color: #f5f0e1;
+            font-family: 'Dancing Script', cursive;
+            color: #5c4033;
+            background-image: url('https://www.transparenttextures.com/patterns/old-paper.png');
+        }
+        .gradio-container {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #a0522d;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .gr-chat {
+            font-size: 18px;
+            color: #5c4033;
+        }
+        """
+    elif style == "Cyber Elite":
+        return """
+        body {
+            background-color: #000000;
+            font-family: 'Courier New', Courier, monospace;
+            color: #00ff00;
+        }
+        .gradio-container {
+            background: #1a1a1a;
+            border: 2px solid #00ff00;
+            box-shadow: 0 4px 8px rgba(0, 255, 0, 0.3);
+        }
+        .gr-chat {
+            font-size: 16px;
+            color: #00ff00;
+        }
+        """
+    else:
+        # Default style
+        return """
+        body {
+            background-color: #f0f0f0;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+        }
+        .gradio-container {
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .gr-chat {
+            font-size: 16px;
+            color: #333;
+        }
+        """
+
+def respond(message, history: list[tuple[str, str]], style="Standard Conversational"):
     global stop_inference
     stop_inference = False  # Reset cancellation flag
 
@@ -26,125 +104,34 @@ def respond(
     if history is None:
         history = []
 
-    if use_local_model:
-        # local inference 
-        messages = [{"role": "system", "content": system_message}]
-        for val in history:
-            if val[0]:
-                messages.append({"role": "user", "content": val[0]})
-            if val[1]:
-                messages.append({"role": "assistant", "content": val[1]})
-        messages.append({"role": "user", "content": message})
+    # API-based inference
+    messages = [{"role": "user", "content": message}]
 
-        response = ""
-        for output in pipe(
-            messages,
-            max_new_tokens=max_tokens,
-            temperature=temperature,
-            do_sample=True,
-            top_p=top_p,
-        ):
-            if stop_inference:
-                response = "Inference cancelled."
-                yield history + [(message, response)]
-                return
-            token = output['generated_text'][-1]['content']
-            response += token
-            yield history + [(message, response)]  # Yield history + new response
-
-    else:
-        # API-based inference 
-        messages = [{"role": "system", "content": system_message}]
-        for val in history:
-            if val[0]:
-                messages.append({"role": "user", "content": val[0]})
-            if val[1]:
-                messages.append({"role": "assistant", "content": val[1]})
-        messages.append({"role": "user", "content": message})
-
-        response = ""
-        for message_chunk in client.chat_completion(
-            messages,
-            max_tokens=max_tokens,
-            stream=True,
-            temperature=temperature,
-            top_p=top_p,
-        ):
-            if stop_inference:
-                response = "Inference cancelled."
-                yield history + [(message, response)]
-                return
-            if stop_inference:
-                response = "Inference cancelled."
-                break
-            token = message_chunk.choices[0].delta.content
-            response += token
-            yield history + [(message, response)]  # Yield history + new response
+    response = ""
+    for message_chunk in client.chat_completion(
+        messages,
+        max_tokens=512,  # Default max tokens for response
+        stream=True,
+        temperature=0.7,  # Default temperature
+        top_p=0.95,  # Default top-p
+    ):
+        if stop_inference:
+            response = "Inference cancelled."
+            yield history + [(message, response)]
+            return
+        token = message_chunk.choices[0].delta.content
+        response += token
+        yield history + [(message, style_response(style, response))]  # Apply selected style to the response
 
 
 def cancel_inference():
     global stop_inference
     stop_inference = True
 
-# Custom CSS for a fancy look
-custom_css = """
-#main-container {
-    background-color: #f0f0f0;
-    font-family: 'Arial', sans-serif;
-}
-
-.gradio-container {
-    max-width: 700px;
-    margin: 0 auto;
-    padding: 20px;
-    background: white;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-}
-
-.gr-button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.gr-button:hover {
-    background-color: #45a049;
-}
-
-.gr-slider input {
-    color: #4CAF50;
-}
-
-.gr-chat {
-    font-size: 16px;
-}
-
-#title {
-    text-align: center;
-    font-size: 2em;
-    margin-bottom: 20px;
-    color: #333;
-}
-"""
-
 # Define the interface
-with gr.Blocks(css=custom_css) as demo:
+with gr.Blocks() as demo:
     gr.Markdown("<h1 style='text-align: center;'>🌟 Fancy AI Chatbot 🌟</h1>")
     gr.Markdown("Interact with the AI chatbot using customizable settings below.")
-
-    with gr.Row():
-        system_message = gr.Textbox(value="You are a friendly Chatbot.", label="System message", interactive=True)
-        use_local_model = gr.Checkbox(label="Use Local Model", value=False)
-
-    with gr.Row():
-        max_tokens = gr.Slider(minimum=1, maximum=2048, value=512, step=1, label="Max new tokens")
-        temperature = gr.Slider(minimum=0.1, maximum=4.0, value=0.7, step=0.1, label="Temperature")
-        top_p = gr.Slider(minimum=0.1, maximum=1.0, value=0.95, step=0.05, label="Top-p (nucleus sampling)")
 
     chat_history = gr.Chatbot(label="Chat")
 
@@ -152,11 +139,20 @@ with gr.Blocks(css=custom_css) as demo:
 
     cancel_button = gr.Button("Cancel Inference", variant="danger")
 
-    # Adjusted to ensure history is maintained and passed correctly
-    user_input.submit(respond, [user_input, chat_history, system_message, max_tokens, temperature, top_p, use_local_model], chat_history)
+    # New feature: Style selection with more formal names
+    style_selection = gr.Dropdown(
+        label="Response Style", 
+        choices=["Standard Conversational", "Nautical Marauder", "Elizabethan Prose", "Cyber Elite"], 
+        value="Standard Conversational"
+    )
 
+    def apply_css(style):
+        return get_css(style)
+
+    # Adjusted to ensure history is maintained and passed correctly
+    user_input.submit(respond, [user_input, chat_history, style_selection], chat_history)
+    style_selection.change(apply_css, style_selection, gr.CSS())
     cancel_button.click(cancel_inference)
 
 if __name__ == "__main__":
     demo.launch(share=False)  # Remove share=True because it's not supported on HF Spaces
-
