@@ -163,9 +163,6 @@ with gr.Blocks() as demo:
             value="Standard Conversational"
         )
     
-    # Display current style
-    style_info = gr.Markdown("Current style: Standard Conversational")
-    
     user_input = gr.Textbox(show_label=False, placeholder="Type your message here...")
     chat_history = gr.Chatbot(label="Chat")
 
@@ -176,8 +173,6 @@ with gr.Blocks() as demo:
         """Update CSS dynamically when the style is changed."""
         css = get_css(style)
         demo.css = css
-        # Update style info text
-        style_info.update(f"Current style: {style}")
 
     # Submit handler to clear input after submission
     def handle_submit(message, history, style):
