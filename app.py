@@ -22,8 +22,6 @@ def style_response(style, response):
         response = response.replace("e", "3").replace("a", "4").replace("t", "7").replace("o", "0").replace("i", "1")
     elif style == "Slangify":
         response = response.replace("you", "ya").replace("are", "r").replace("hello", "hey").replace("friend", "buddy")
-    elif style == "Simple Standard":
-        response = response  # No modification for simple standard
     return response
 
 def get_css(style):
@@ -98,23 +96,6 @@ def get_css(style):
             color: #333;
         }
         """
-    elif style == "Simple Standard":
-        return """
-        body {
-            background-color: #f9f9f9;
-            font-family: 'Arial', sans-serif;
-            color: #333;
-        }
-        .gradio-container {
-            background: #fff;
-            border: 2px solid #ddd;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .gr-chat {
-            font-size: 16px;
-            color: #333;
-        }
-        """
     else:
         # Default style
         return """
@@ -124,7 +105,7 @@ def get_css(style):
             color: #333;
         }
         .gradio-container {
-            background: blue;
+            background: white;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
         }
@@ -178,7 +159,7 @@ with gr.Blocks() as demo:
     with gr.Row():
         style_selection = gr.Dropdown(
             label="Response Style", 
-            choices=["Standard Conversational", "Simple Standard", "Nautical Marauder", "Elizabethan Prose", "Cyber Elite", "Slangify"], 
+            choices=["Standard Conversational", "Nautical Marauder", "Elizabethan Prose", "Cyber Elite", "Slangify"], 
             value="Standard Conversational"
         )
     
