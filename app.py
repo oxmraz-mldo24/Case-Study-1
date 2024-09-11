@@ -149,8 +149,16 @@ def cancel_inference():
 
 # Define the interface
 with gr.Blocks() as demo:
-    gr.Markdown("<h1 style='text-align: center;'>🌟 Fancy AI Chatbot 🌟</h1>")
-    gr.Markdown("Interact with the AI chatbot using customizable settings below.")
+    # Add style selection at the top
+    with gr.Row():
+        style_selection = gr.Dropdown(
+            label="Response Style", 
+            choices=["Standard Conversational", "Nautical Marauder", "Elizabethan Prose", "Cyber Elite", "Slangify"], 
+            value="Standard Conversational"
+        )
+
+    gr.Markdown("<h1 style='text-align: center;'>🔮 Slangify Chatbot 🔮</h1>")
+    gr.Markdown("Please select the style you would like to talk to the AI in：")
 
     chat_history = gr.Chatbot(label="Chat")
 
@@ -158,20 +166,18 @@ with gr.Blocks() as demo:
 
     cancel_button = gr.Button("Cancel Inference", variant="danger")
 
-    # New feature: Style selection with more formal names
-    style_selection = gr.Dropdown(
-        label="Response Style", 
-        choices=["Standard Conversational", "Nautical Marauder", "Elizabethan Prose", "Cyber Elite", "Slangify"], 
-        value="Standard Conversational"
-    )
-
     # Apply CSS based on style selection
     def apply_css(style):
         return get_css(style)
 
+    # Update CSS dynamically when the style is changed
+    def update_css(style):
+        css = get_css(style)
+        demo.css = css
+
     # Adjusted to ensure history is maintained and passed correctly
     user_input.submit(respond, [user_input, chat_history, style_selection], chat_history)
-    style_selection.change(lambda style: apply_css(style))  # Update CSS dynamically
+    style_selection.change(update_css)  # Update CSS dynamically
     cancel_button.click(cancel_inference)
 
 if __name__ == "__main__":
