@@ -150,7 +150,7 @@ def cancel_inference():
 # Define the interface
 with gr.Blocks() as demo:
     gr.Markdown("<h1 style='text-align: center;'>🔮 StyleChat 🔮</h1>")
-    gr.Markdown("Please select the style you would like to talk to the AI in.")
+    gr.Markdown("Please select the style you would like AI to reply to you..")
     # Add style selection at the top
     with gr.Row():
         style_selection = gr.Dropdown(
