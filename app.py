@@ -20,6 +20,8 @@ def style_response(style, response):
         response = response.replace("your", "thy").replace("the", "thee").replace("has", "hath").replace("do", "doth")
     elif style == "Cyber Elite":
         response = response.replace("e", "3").replace("a", "4").replace("t", "7").replace("o", "0").replace("i", "1")
+    elif style == "Slangify":
+        response = response.replace("you", "ya").replace("are", "r").replace("hello", "hey").replace("friend", "buddy")
     return response
 
 def get_css(style):
@@ -75,6 +77,23 @@ def get_css(style):
         .gr-chat {
             font-size: 16px;
             color: #00ff00;
+        }
+        """
+    elif style == "Slangify":
+        return """
+        body {
+            background-color: #fafafa;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+        }
+        .gradio-container {
+            background: #fff;
+            border: 2px solid #ccc;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .gr-chat {
+            font-size: 16px;
+            color: #333;
         }
         """
     else:
@@ -142,16 +161,17 @@ with gr.Blocks() as demo:
     # New feature: Style selection with more formal names
     style_selection = gr.Dropdown(
         label="Response Style", 
-        choices=["Standard Conversational", "Nautical Marauder", "Elizabethan Prose", "Cyber Elite"], 
+        choices=["Standard Conversational", "Nautical Marauder", "Elizabethan Prose", "Cyber Elite", "Slangify"], 
         value="Standard Conversational"
     )
 
+    # Apply CSS based on style selection
     def apply_css(style):
         return get_css(style)
 
     # Adjusted to ensure history is maintained and passed correctly
     user_input.submit(respond, [user_input, chat_history, style_selection], chat_history)
-    style_selection.change(apply_css, style_selection, gr.CSS())
+    style_selection.change(lambda style: apply_css(style))  # Update CSS dynamically
     cancel_button.click(cancel_inference)
 
 if __name__ == "__main__":
