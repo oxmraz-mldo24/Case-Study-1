@@ -1,5 +1,5 @@
 ---
-title: Case-Study-1: Image-To-Music
+title: Case-Study-1 - Image-To-Music
 emoji: 🎼
 colorFrom: gray
 colorTo: blue
