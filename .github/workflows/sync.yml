@@ -17,4 +17,4 @@ jobs:
       - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push https://oxmraz-mldo:$HF_TOKEN@huggingface.co/spaces/Group17WPIMLDO24/Case-Study-1 main --force
+        run: git push https://oxmraz-mldo:$HF_TOKEN@huggingface.co/spaces/Group17WPIMLDO24/Case-Study-1 main
