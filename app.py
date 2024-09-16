@@ -4,7 +4,6 @@ import logging as log
 import time
 import uuid
 import gradio as gr
-import os
 
 # local imports
 from blip_image_caption_large import Blip_Image_Caption_Large
@@ -30,16 +29,6 @@ class Image_To_Music:
         self.caption_generation_duration = -1
         self.description_generation_duration = -1
         self.music_generation_duration = -1
-        self.create_output_folder()
-
-
-    # ----ATTRIBUTION-START----
-    # LLM: Github Copilot
-    # PROMPT: create an output folder for the generated audio files
-    # EDITS: /
-    def create_output_folder(self):
-        os.makedirs(config.AUDIO_DIR, exist_ok=True)
-    # -----ATTRIBUTION-END-----
 
     def caption_image(self, image_path):
         log.info("Captioning Image...")

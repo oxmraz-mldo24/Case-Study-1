@@ -1,5 +1,6 @@
 import os
 import logging as log
+
 log.basicConfig(level=log.INFO)
 
 IMAGE_CAPTION_MODEL = "Salesforce/blip-image-captioning-large"
@@ -17,7 +18,18 @@ MUSICGEN_MAX_NEW_TOKENS = 256 # 5 seconds of audio
 AUDIO_DIR = "Case-Study-1/data/"
 
 HF_API_TOKEN = os.getenv("HF_API_TOKEN")
+
 if HF_API_TOKEN:
     log.info(f"Read HF_API_TOKEN: {HF_API_TOKEN[0:4]}...")
 else:
     print("HF_API_TOKEN not found in environment variables.")
+
+# ----ATTRIBUTION-START----
+# LLM: Github Copilot
+# PROMPT: create an output folder for the generated audio files
+# EDITS: /
+def create_output_folder():
+    os.makedirs(AUDIO_DIR, exist_ok=True)
+# -----ATTRIBUTION-END-----
+
+create_output_folder()
