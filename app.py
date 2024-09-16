@@ -136,7 +136,7 @@ def gradio():
 
         # ----ATTRIBUTION-START----
         # LLM: ChatGPT4o
-        # PROMPT: now, i need sliders for the different models that are used in the product:\n LLM_MAX_NEW_TOKENS = 50\nLLM_TEMPERATURE = 0.7\nLLM_TOP_P = 0.95\nMUSICGEN_MAX_NEW_TOKENS = 256 # 256 =  5 seconds of audio\n they should be in a hidden menu that opens when i click on "advanced options"\nplease label them for the end user and fit them nicely in the following ui: <code>
+        # PROMPT: Now, I need sliders for the different models that are used in the product:\n LLM_MAX_NEW_TOKENS = 50\nLLM_TEMPERATURE = 0.7\nLLM_TOP_P = 0.95\nMUSICGEN_MAX_NEW_TOKENS = 256 # 256 =  5 seconds of audio\n they should be in a hidden menu that opens when I click on "advanced options"\nPlease label them for the end user and fit them nicely in the following UI: <code>
         # EDITS: added interactive flags
         # Advanced options with sliders
         with gr.Accordion("Advanced Options", open=False):
