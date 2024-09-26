@@ -1,6 +1,11 @@
 #!/usr/bin/expect -f
+set PASSPHRASE_GROUP17 [lindex $argv 0]
 spawn ./setupaccess.sh
-set timeout 2
+set timeout 5
+expect "The authenticity of host"
+send "yes\r"
+expect "Enter passphrase for key 'group17':\r"
+send "$PASSPHRASE_GROUP17\r"
 expect "Enter passphrase for key 'group17':\r"
 send "$PASSPHRASE_GROUP17\r"
 expect "Enter passphrase for key 'group17':\r"
