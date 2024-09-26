@@ -1,0 +1,25 @@
+name: Setup Access
+
+on:
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest 
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install expect
+        run: sudo apt-get install expect
+
+      - name: Add permission for script to run
+        run: chmod +x setupaccess.sh
+      
+      - name: Run Bash Scripts
+        env:
+          PASSPHRASE_GROUP17: ${{ secrets.PASSPHRASE_GROUP17 }}
+          GROUP17_PUBLICKKEY: ${{ secrets.GROUP17_PUBLICKKEY }}
+          GROUP17_PRIVATEKEY: ${{ secrets.GROUP17_PRIVATEKEY }}
+        run: expect setupaccess.exp "$PASSPHRASE_GROUP17" # this one has code triggering setupaccess.sh, so command ultimately runs multiple scripts :)
