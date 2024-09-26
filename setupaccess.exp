@@ -1,0 +1,8 @@
+#!/usr/bin/expect -f
+spawn ./setupaccess.sh
+set timeout 2
+expect "Enter passphrase for key 'group17':\r"
+send "$PASSPHRASE_GROUP17\r"
+expect "Enter passphrase for key 'group17':\r"
+send "$PASSPHRASE_GROUP17\r"
+expect eof
