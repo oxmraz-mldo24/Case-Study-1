@@ -1,2 +1,5 @@
 /__pycache__
 *.wav
+.pytest_cache
+/audio_data
+.cache
