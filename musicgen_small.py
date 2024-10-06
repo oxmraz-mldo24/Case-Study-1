@@ -36,11 +36,13 @@ class Musicgen_Small:
         # EDITS: changed variables to match the code
 
         # Convert the byte content into an audio array
-        audio_buffer = BytesIO(response.content)
-
-        # Use scipy to save the audio, assuming it's a WAV format audio stream
-        # If it's raw PCM audio, you would need to decode it first.
-        with open(audio_path, "wb") as f:
-            f.write(audio_buffer.read())
-        # -----ATTRIBUTION-END-----
+        try:
+            audio_buffer = BytesIO(response.content)
+            # Use scipy to save the audio, assuming it's a WAV format audio stream
+            # If it's raw PCM audio, you would need to decode it first.
+            with open(audio_path, "wb") as f:
+                f.write(audio_buffer.read())
+            # -----ATTRIBUTION-END-----
+        except Exception as e:
+            print(f"Error: {e}")
 

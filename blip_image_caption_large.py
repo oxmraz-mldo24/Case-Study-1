@@ -22,5 +22,8 @@ class Blip_Image_Caption_Large:
 
     def caption_image_api(self, image_path):
         client = InferenceClient(config.IMAGE_CAPTION_MODEL, token=config.HF_API_TOKEN)
-        result = client.image_to_text(image_path).generated_text
+        try:
+            result = client.image_to_text(image_path).generated_text
+        except Exception as e:
+            result = f"Error: {e}"
         return result
