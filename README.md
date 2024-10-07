@@ -8,7 +8,7 @@ sdk_version: 4.44.0
 app_file: app.py
 pinned: false
 ---
-
+ 
 ## Case-Study-1: Image-To-Music 🎼
 
 An image to music converter, built with the following models:
