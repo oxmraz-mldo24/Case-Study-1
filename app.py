@@ -159,6 +159,6 @@ def gradio():
         generate_button = gr.Button("Generate Music")
         generate_button.click(fn=run_image_to_music, inputs=[image_input, llm_max_new_tokens, llm_temperature, llm_top_p, musicgen_max_seconds, local_captioning, local_llm, local_music_gen], outputs=[caption_output, music_description_output, music_output, durations])
     # Launch Gradio app
-    demo.launch()
+    demo.launch(server_port=config.SERVICE_PORT, server_name=config.SERVER_NAME)
 
 gradio()
