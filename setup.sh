@@ -34,10 +34,12 @@ if [ -d "Case-Study-1" ]; then
     cd Case-Study-1
     if git pull | grep -q 'Already up to date.'; then
         echo "Repository is up to date. Proceeding with setup."
+        cd Case-Study-1
 
     else
         echo "Repository updated successfully. Proceeding to next step."
 		git clone https://github.com/oxmraz-mldo24/Case-Study-1.git
+        cd Case-Study-1
 	fi
 else
     echo "Cloning repository..."
