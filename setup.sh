@@ -29,28 +29,14 @@ echo "Virtual environment $VENV_DIR activated."
 
 pip install --upgrade pip
 
-if [ -d "Case-Study-1" ]; then
-    echo "Repository folder 'Case-Study-1' already exists. Checking for updates."
-    cd Case-Study-1
-    if git pull | grep -q 'Already up to date.'; then
-        echo "Repository is up to date. Proceeding with setup."
-        cd Case-Study-1
 
-    else
-        echo "Repository updated successfully. Proceeding to next step."
-		git clone https://github.com/oxmraz-mldo24/Case-Study-1.git
-        cd Case-Study-1
-	fi
+if git pull | grep -q 'Already up to date.'; then
+    echo "Repository is up to date. Proceeding with setup."
+
 else
-    echo "Cloning repository..."
-    if git clone https://github.com/oxmraz-mldo24/Case-Study-1.git; then
-        echo "Repository cloned successfully. Proceeding to next step."
-        cd Case-Study-1
-    else
-        echo "Failed to clone repository. Exiting."
-        exit 1
-    fi
+    echo "Repository updated successfully. Proceeding to next step."
 fi
+
 echo "Checking if http://127.0.0.1:7860 is running..."
 if curl -s --head http://127.0.0.1:7860 | grep "200 OK" > /dev/null; then
     echo "URL is running.No further action required. Exiting."
