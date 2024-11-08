@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  i2m:
+    build:
+      context: .
+      dockerfile: Dockerfile_i2m
+    ports:
+      - "7860:7860"
+      - "8000:8000"
+      - "9100:9100"
+    networks:
+      - group17_i2m
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - prometheus_vol:/prometheus  
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml 
+    ports:
+      - "9090:9090"  
+    networks:
+      - group17_i2m
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000" 
+    networks:
+      - group17_i2m
+    volumes:
+      - grafana_vol:/var/lib/grafana
+
+networks:
+  group17_i2m:
+    driver: bridge
+
+volumes:
+  grafana_vol:
+  prometheus_vol:  

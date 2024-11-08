@@ -4,6 +4,7 @@ import logging as log
 import time
 import uuid
 import gradio as gr
+from prometheus_client import start_http_server, Counter, Summary, Histogram
 
 # local imports
 from blip_image_caption_large import Blip_Image_Caption_Large
@@ -12,6 +13,16 @@ from musicgen_small import Musicgen_Small
 import config
 
 log.basicConfig(level=log.INFO)
+
+# Prometheus metrics
+REQUEST_COUNTER = Counter('app_requests_total', 'Total number of requests')
+SUCCESSFUL_REQUESTS = Counter('app_successful_requests_total', 'Total number of successful requests')
+REQUEST_DURATION = Summary('app_request_duration_seconds', 'Time spent processing request')
+
+REQUEST_DURATION = Histogram('request_duration_seconds', 'Duration of the entire run function', buckets=[0.1, 0.5, 1, 2, 5, 10])
+CAPTION_IMAGE_DURATION = Histogram('caption_image_duration_seconds', 'Duration of caption_image function')
+GENERATE_DESCRIPTION_DURATION = Histogram('generate_description_duration_seconds', 'Duration of generate_description function')
+GENERATE_MUSIC_DURATION = Histogram('generate_music_duration_seconds', 'Duration of generate_music function')
 
 
 class Image_To_Music:
@@ -100,9 +111,13 @@ class Image_To_Music:
         return [self.generated_caption, self.generated_description, self.audio_path,self.get_durations()]
     
     def run(self, image_path):
+        REQUEST_COUNTER.inc()
+        request_timer = REQUEST_DURATION.time()
         self.caption_image(image_path)
         self.generate_description()
         self.generate_music()
+        
+        SUCCESSFUL_REQUESTS.inc()
         return [self.generated_caption, self.generated_description, self.audio_path, self.get_durations()]
 
 
@@ -159,6 +174,7 @@ def gradio():
         generate_button = gr.Button("Generate Music")
         generate_button.click(fn=run_image_to_music, inputs=[image_input, llm_max_new_tokens, llm_temperature, llm_top_p, musicgen_max_seconds, local_captioning, local_llm, local_music_gen], outputs=[caption_output, music_description_output, music_output, durations])
     # Launch Gradio app
+    start_http_server(8000)
     demo.launch(server_port=config.SERVICE_PORT, server_name=config.SERVER_NAME)
 
 gradio()

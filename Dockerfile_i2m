@@ -15,4 +15,7 @@ RUN apt-get update && \
 RUN pip install --no-cache-dir -r /opt/app/requirements.txt
 
 EXPOSE 7860
-CMD bash -c "python /opt/app/app.py"
+EXPOSE 8100
+EXPOSE 9100
+
+CMD bash -c "prometheus-node-exporter --web.listen-address=':9100' & python /opt/app/app.py"
