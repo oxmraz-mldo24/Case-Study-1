@@ -4,7 +4,11 @@ import logging as log
 import time
 import uuid
 import gradio as gr
-from prometheus_client import start_http_server, Counter, Summary, Histogram
+from prometheus_client import start_http_server, Counter, Histogram
+import os
+
+
+start_http_server(8000)
 
 # local imports
 from blip_image_caption_large import Blip_Image_Caption_Large
@@ -17,13 +21,11 @@ log.basicConfig(level=log.INFO)
 # Prometheus metrics
 REQUEST_COUNTER = Counter('app_requests_total', 'Total number of requests')
 SUCCESSFUL_REQUESTS = Counter('app_successful_requests_total', 'Total number of successful requests')
-REQUEST_DURATION = Summary('app_request_duration_seconds', 'Time spent processing request')
-
-REQUEST_DURATION = Histogram('request_duration_seconds', 'Duration of the entire run function', buckets=[0.1, 0.5, 1, 2, 5, 10])
-CAPTION_IMAGE_DURATION = Histogram('caption_image_duration_seconds', 'Duration of caption_image function')
-GENERATE_DESCRIPTION_DURATION = Histogram('generate_description_duration_seconds', 'Duration of generate_description function')
-GENERATE_MUSIC_DURATION = Histogram('generate_music_duration_seconds', 'Duration of generate_music function')
-
+FAILED_REQUESTS = Counter('app_failed_requests_total', 'Total number of failed requests')
+TOTAL_REQUEST_DURATION = Histogram('app_total_request_duration_seconds', 'Time spent processing request', buckets=[5, 50, 100, 150, 500, 1000])
+IMAGE_CAPTION_REQUEST_DURATION = Histogram('app_image_caption_request_duration_seconds', 'Time spent processing image caption request', buckets=[1, 2, 5, 10, 50, 100, 500])
+MUSIC_DESCRIPTION_REQUEST_DURATION = Histogram('app_music_description_request_duration_seconds', 'Time spent processing music description request', buckets=[1, 2, 5, 10, 50, 100, 500])
+MUSIC_GENERATION_REQUEST_DURATION = Histogram('app_music_generation_request_duration_seconds', 'Time spent processing music generation request', buckets=[1, 2, 5, 10, 50, 100, 500])
 
 class Image_To_Music:
     def __init__(self, use_local_caption=False, use_local_llm=False, use_local_musicgen=False):
@@ -100,24 +102,21 @@ class Image_To_Music:
     def get_durations(self):
             return f"Caption Generation Time: {self.caption_generation_duration:.2f} seconds\nDescription Generation Time: {self.description_generation_duration:.2f} seconds\nMusic Generation Time: {self.music_generation_duration:.2f} seconds\nTotal Time: {self.caption_generation_duration + self.description_generation_duration + self.music_generation_duration:.2f} seconds"
 
-    def run_yield(self, image_path):
 
-        self.caption_image(image_path)
-        yield [self.generated_caption, None, None, None]
-        self.generate_description()
-        yield [self.generated_caption, self.generated_description, None, None]
-        self.generate_music()
-        yield [self.generated_caption, self.generated_description, self.audio_path, None]
-        return [self.generated_caption, self.generated_description, self.audio_path,self.get_durations()]
-    
     def run(self, image_path):
         REQUEST_COUNTER.inc()
-        request_timer = REQUEST_DURATION.time()
-        self.caption_image(image_path)
-        self.generate_description()
-        self.generate_music()
+        with TOTAL_REQUEST_DURATION.time():
+            with IMAGE_CAPTION_REQUEST_DURATION.time():
+                self.caption_image(image_path)
+            with MUSIC_DESCRIPTION_REQUEST_DURATION.time():
+                self.generate_description()
+            with MUSIC_GENERATION_REQUEST_DURATION.time():
+                self.generate_music()   
         
-        SUCCESSFUL_REQUESTS.inc()
+        if os.path.isfile(self.audio_path) and os.path.getsize(self.audio_path) > 0:
+            SUCCESSFUL_REQUESTS.inc()
+        else:
+            FAILED_REQUESTS.inc()
         return [self.generated_caption, self.generated_description, self.audio_path, self.get_durations()]
 
 
@@ -174,7 +173,6 @@ def gradio():
         generate_button = gr.Button("Generate Music")
         generate_button.click(fn=run_image_to_music, inputs=[image_input, llm_max_new_tokens, llm_temperature, llm_top_p, musicgen_max_seconds, local_captioning, local_llm, local_music_gen], outputs=[caption_output, music_description_output, music_output, durations])
     # Launch Gradio app
-    start_http_server(8000)
     demo.launch(server_port=config.SERVICE_PORT, server_name=config.SERVER_NAME)
 
 gradio()

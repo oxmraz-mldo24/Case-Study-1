@@ -1,9 +1,13 @@
 # external imports
 from transformers import pipeline
 from huggingface_hub import InferenceClient
+from prometheus_client import Counter
 
 # local imports
 import config
+
+CAPTION_ERRORS = Counter('app_caption_model_error', 'Total number of errors in the caption model')
+
 
 class Blip_Image_Caption_Large:
     def __init__(self):
@@ -25,5 +29,6 @@ class Blip_Image_Caption_Large:
         try:
             result = client.image_to_text(image_path).generated_text
         except Exception as e:
+            CAPTION_ERRORS.inc()
             result = f"Error: {e}"
         return result

@@ -3,9 +3,11 @@ from transformers import pipeline
 from io import BytesIO
 import requests
 import scipy
+from prometheus_client import Counter
 
 # local imports
 import config
+MUSICGEN_ERRORS = Counter('app_musicgen_model_error', 'Total number of errors in the Music generation model')
 
 class Musicgen_Small:
     def __init__(self):
@@ -44,5 +46,6 @@ class Musicgen_Small:
                 f.write(audio_buffer.read())
             # -----ATTRIBUTION-END-----
         except Exception as e:
+            MUSICGEN_ERRORS.inc()
             print(f"Error: {e}")
 

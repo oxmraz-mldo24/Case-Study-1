@@ -2,9 +2,13 @@
 from transformers import pipeline
 from huggingface_hub import InferenceClient
 import torch
+from prometheus_client import Counter
+
 # local imports
 import config
 from llama_cpp import Llama
+
+DESCRIPTION_ERRORS = Counter('app_description_model_error', 'Total number of errors in the description model')
 
 
 class Phi3_Mini_4k_Instruct:
@@ -41,5 +45,6 @@ class Phi3_Mini_4k_Instruct:
         try:
             result = client.chat_completion(messages, max_tokens=config.LLM_MAX_NEW_TOKENS, temperature=config.LLM_TEMPERATURE, top_p=config.LLM_TOP_P).choices[0].message.content
         except Exception as e:
+            DESCRIPTION_ERRORS.inc()
             result = f"Error: {e}"
         return result
