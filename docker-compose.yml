@@ -6,9 +6,9 @@ services:
       context: .
       dockerfile: Dockerfile_i2m
     ports:
-      - "7860:7860"
-      - "8000:8000"
-      - "9100:9100"
+      - "4441:7860"
+      - "4442:8000"
+      - "4443:9100"
     environment:
       - HF_API_TOKEN=${HF_API_TOKEN}
     networks:
@@ -21,14 +21,14 @@ services:
       - prometheus_vol:/prometheus  
       - ./prometheus.yml:/etc/prometheus/prometheus.yml 
     ports:
-      - "9090:9090"  
+      - "4444:9090"  
     networks:
       - group17_i2m
 
   grafana:
     image: grafana/grafana:latest
     ports:
-      - "3000:3000" 
+      - "4445:3000" 
     networks:
       - group17_i2m
     volumes:
