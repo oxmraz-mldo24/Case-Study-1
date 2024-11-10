@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile_i2m
+    container_name: group17_i2m
     ports:
       - "4441:7860"
       - "4442:8000"
@@ -17,6 +18,7 @@ services:
 
   prometheus:
     image: prom/prometheus:latest
+    container_name: group17_prometheus
     volumes:
       - prometheus_vol:/prometheus  
       - ./prometheus.yml:/etc/prometheus/prometheus.yml 
@@ -27,6 +29,7 @@ services:
 
   grafana:
     image: grafana/grafana:latest
+    container_name: group17_grafana
     ports:
       - "4445:3000" 
     networks:
@@ -36,6 +39,7 @@ services:
 
   ngrok:
     image: ngrok/ngrok:latest
+    container_name: group17_ngrok1
     restart: unless-stopped
     command:
       - "start"
@@ -54,6 +58,7 @@ services:
   
   ngrok2:
     image: ngrok/ngrok:latest
+    container_name: group17_ngrok2
     restart: unless-stopped
     command:
       - "start"
