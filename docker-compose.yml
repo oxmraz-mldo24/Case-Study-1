@@ -50,7 +50,7 @@ services:
     volumes:
       - ./ngrok.yml:/etc/ngrok.yml
     ports:
-      - 4046:4040 
+      - 4446:4040 
     environment:
       - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
     networks:
@@ -69,7 +69,7 @@ services:
     volumes:
       - ./ngrok2.yml:/etc/ngrok2.yml
     ports:
-      - 4047:4040 
+      - 4447:4040 
     environment:
       - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN2}
     networks:
