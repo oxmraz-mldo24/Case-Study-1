@@ -1,0 +1,6 @@
+version: "2"
+tunnels:
+  grafana:
+    addr: grafana:3000
+    proto: http
+    domain: grateful-living-dragon.ngrok-free.app

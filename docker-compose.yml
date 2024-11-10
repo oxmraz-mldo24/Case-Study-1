@@ -34,6 +34,44 @@ services:
     volumes:
       - grafana_vol:/var/lib/grafana
 
+  ngrok:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    command:
+      - "start"
+      - "--all"
+      - "--config"
+      - "/etc/ngrok.yml"
+      - "--region=us"
+    volumes:
+      - ./ngrok.yml:/etc/ngrok.yml
+    ports:
+      - 4046:4040 
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    networks:
+      - group17_i2m
+  
+  ngrok2:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    command:
+      - "start"
+      - "--all"
+      - "--config"
+      - "/etc/ngrok2.yml"
+      - "--region=us"
+    volumes:
+      - ./ngrok2.yml:/etc/ngrok2.yml
+    ports:
+      - 4047:4040 
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN2}
+    networks:
+      - group17_i2m
+    
+
+
 networks:
   group17_i2m:
     driver: bridge

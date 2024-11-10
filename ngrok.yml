@@ -1,0 +1,6 @@
+version: "2"
+tunnels:
+  i2m:
+    addr: i2m:7860
+    proto: http
+    domain: factual-uniquely-orca.ngrok-free.app
