@@ -1,10 +1,10 @@
 name: Azure Container Apps Deploy
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - docker
+  workflow_dispatch:
 
 jobs:
   build:
