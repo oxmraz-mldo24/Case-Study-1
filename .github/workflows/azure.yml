@@ -25,3 +25,4 @@ jobs:
           containerAppName: my-container-app
           resourceGroup: group17cs553
           dockerfilePath: Dockerfile_i2m
+          targetPort: 7860
