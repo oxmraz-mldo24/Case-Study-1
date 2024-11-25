@@ -38,6 +38,5 @@ jobs:
           acrName: group17cs533b2024
           resourceGroup: group17cs553
           dockerfilePath: Dockerfile_i2m
-          environmentVariables: 'HF_API_TOKEN=${{ secrets.HF_API_TOKEN }}'
 
 
