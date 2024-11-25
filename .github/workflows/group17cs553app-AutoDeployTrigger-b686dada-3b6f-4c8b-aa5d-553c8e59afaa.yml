@@ -34,15 +34,12 @@ jobs:
       - name: Build and push container image to registry
         uses: azure/container-apps-deploy-action@v2
         with:
-          appSourcePath: ${{ github.workspace }}/Dockerfile_i2m
-          _dockerfilePathKey_: _dockerfilePath_
+          appSourcePath: ${{ github.workspace }}
           registryUrl: docker.io
           registryUsername: ${{ secrets.GROUP17CS553APP_REGISTRY_USERNAME }}
           registryPassword: ${{ secrets.GROUP17CS553APP_REGISTRY_PASSWORD }}
           containerAppName: group17cs553app
           resourceGroup: group17cs553
-          imageToBuild: oxmraz/group17cs553app:${{ github.sha }}
-          _buildArgumentsKey_: |
-            _buildArgumentsValues_
+          dockerfilePath: Dockerfile_i2m
 
 
