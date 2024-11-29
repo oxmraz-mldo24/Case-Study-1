@@ -17,11 +17,11 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Build and deploy Container App
-      uses: azure/container-apps-deploy-action@v1
-      with:
-        appSourcePath: ${{ github.workspace }}
-        acrName: cs553extracredit
-        containerAppName: my-container-app
-        resourceGroup: group17cs553
-        dockerfilePath: Dockerfile_i2m
+      - name: Build and deploy Container App
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          appSourcePath: ${{ github.workspace }}
+          acrName: cs553extracredit
+          containerAppName: my-container-app
+          resourceGroup: group17cs553
+          dockerfilePath: Dockerfile_i2m
