@@ -22,7 +22,6 @@ jobs:
         with:
           appSourcePath: ${{ github.workspace }}
           acrName: cs553extracredit
-          containerAppName: my-container-app
           resourceGroup: group17cs553
           dockerfilePath: Dockerfile_i2m
           acrUsername: ${{ secrets.ACRUSERNAME }}
