@@ -26,3 +26,6 @@ jobs:
           dockerfilePath: Dockerfile_i2m
           acrUsername: ${{ secrets.ACRUSERNAME }}
           acrPassword: ${{ secrets.ACRPASSWORD }}
+          targetPort: 7860
+          ingress: external
+          
