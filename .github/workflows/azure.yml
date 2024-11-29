@@ -25,3 +25,5 @@ jobs:
           containerAppName: my-container-app
           resourceGroup: group17cs553
           dockerfilePath: Dockerfile_i2m
+          acrUsername: ${{ secrets.ACRUSERNAME }}
+          acrPassword: ${{ secrets.ACRPASSWORD }}
